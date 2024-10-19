@@ -1,0 +1,32 @@
+import java.sql.*;
+
+public class EmployeeManagement {
+    private static final String URL = "jdbc:mysql://localhost:3306/your_database";
+    private static final String USER = "your_username";
+    private static final String PASSWORD = "your_password";
+
+    public static void main(String[] args) {
+        int employeeId = 1;
+        String employeeName;
+        String employeeDepartment;
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             CallableStatement callableStatement = connection.prepareCall("{CALL getEmployeeInfo(?, ?, ?)}")) {
+
+            callableStatement.setInt(1, employeeId);
+            callableStatement.registerOutParameter(2, Types.VARCHAR);
+            callableStatement.registerOutParameter(3, Types.VARCHAR);
+
+            callableStatement.execute();
+
+            employeeName = callableStatement.getString(2);
+            employeeDepartment = callableStatement.getString(3);
+
+            System.out.println("Employee Name: " + employeeName);
+            System.out.println("Employee Department: " + employeeDepartment);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
